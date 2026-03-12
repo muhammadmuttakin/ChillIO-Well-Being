@@ -19,7 +19,7 @@ class HomeViewModel: ObservableObject {
         return audioList.filter { $0.category == cat }
     }
     
-    var categories: [String] { ["Stress", "Anxious", "Sleep", "Focus"] }
+    var categories: [String] { ["Stress", "Anxious", "Sleep", "Self-Esteem"] }
     
     func selectAudio(_ item: AudioItem) {
         selectedAudio = item

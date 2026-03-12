@@ -20,7 +20,7 @@ struct HomeView: View {
                                 .font(.system(size: 14, weight: .regular))
                                 .foregroundColor(.white.opacity(0.8))
                             Text("Hi, \(onboardingVM.userName)")
-                                .font(.system(size: 26, weight: .bold))
+                                .font(.custom("HiraMinProN-W6", size: 26))
                                 .foregroundColor(.white)
                         }
                         .padding(20)
@@ -28,9 +28,18 @@ struct HomeView: View {
                     // Tailored For You section
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Tailored For You")
-                            .font(.system(size: 20, weight: .bold))
+                            .font(.custom("HiraMinProN-W6", size: 20))
                             .foregroundColor(.chillText)
                         
+                        // Tags
+                        HStack(spacing: 0) {
+                            if let goal = onboardingVM.userProfile.goal {
+                                TagBadge(title: goal.tag, iconName: goal.iconName)
+                            } else {
+                                TagBadge(title: "Stress", iconName: "apple.meditate")
+                                TagBadge(title: "Anxious", iconName: "figure.mind.and.body.circle")
+                            }
+                        }
                         // Audio list — no category filter
                         VStack(spacing: 10) {
                             ForEach(vm.audioList.prefix(4)) { item in
@@ -49,6 +58,7 @@ struct HomeView: View {
                             }
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.chillGreen)
+                            .underline()
                             Spacer()
                         }
                         .padding(.top, 4)

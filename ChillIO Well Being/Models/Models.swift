@@ -22,10 +22,10 @@ enum OnboardingGoal: String, CaseIterable, Identifiable {
     
     var iconName: String {
         switch self {
-        case .reduceStress:    return "leaf.fill"
-        case .reduceAnxiety:   return "plus.circle"
-        case .betterSleep:     return "moon.fill"
-        case .buildSelfEsteem: return "figure.walk"
+        case .reduceStress:    return "apple.meditate"
+        case .reduceAnxiety:   return "figure.mind.and.body.circle"
+        case .betterSleep:     return "moon.stars"
+        case .buildSelfEsteem: return "figure.stair.stepper"
         }
     }
     
@@ -64,7 +64,16 @@ enum AudioCategory: String, CaseIterable {
     case stress    = "Stress"
     case anxious   = "Anxious"
     case sleep     = "Sleep"
-    case focus     = "Focus"
+    case esteem     = "Self Esteem"
+    
+    var iconName: String {
+        switch self {
+        case .stress:    return "apple.meditate"
+        case .anxious:   return "figure.mind.and.body.circle"
+        case .sleep:     return "moon.stars"
+        case .esteem:    return "figure.stair.stepper"
+        }
+    }
 }
 
 // MARK: - Sample Data
@@ -75,7 +84,7 @@ extension AudioItem {
         AudioItem(type: "Guided",      title: "Body Scan Relaxation", description: "Release tension from head to toe",        duration: 720,  imageName: "audio_guided_1",      category: .anxious),
         AudioItem(type: "Music",       title: "Deep Sleep Journey",   description: "Drift into peaceful slumber",             duration: 1800, imageName: "audio_sleep_1",       category: .sleep),
         AudioItem(type: "Meditation",  title: "Anxiety Release",      description: "Gentle techniques for anxious minds",    duration: 480,  imageName: "audio_meditation_2",  category: .anxious),
-        AudioItem(type: "Binaural",    title: "Focus Flow State",     description: "Enter deep concentration",               duration: 1200, imageName: "audio_binaural_1",    category: .focus),
+        AudioItem(type: "Binaural",    title: "Improving Self-Esteem",     description: "Enter deep concentration",               duration: 1200, imageName: "audio_binaural_1",    category: .esteem),
         AudioItem(type: "Guided",      title: "Self-Compassion Walk", description: "Embrace kindness toward yourself",       duration: 540,  imageName: "audio_guided_2",      category: .stress),
         AudioItem(type: "Sound Bath",  title: "Ocean Waves Healing",  description: "Ride the calming tide",                  duration: 660,  imageName: "audio_soundbath_2",   category: .sleep),
     ]

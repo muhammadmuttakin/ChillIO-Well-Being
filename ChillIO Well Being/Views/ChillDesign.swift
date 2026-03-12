@@ -36,7 +36,7 @@ struct ForestBannerView: View {
 
             if let title = title {
                 Text(title)
-                    .font(.system(size: 26, weight: .bold))
+                    .font(.custom("HiraMinProN-W6", size: 26))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(ChillDesign.horizontalPad)
