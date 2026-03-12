@@ -1,10 +1,3 @@
-//
-//  AudioPlayerView.swift
-//  ChillIO Well Being
-//
-//  Created by Muhammad Muttakin on 12/03/26.
-//
-
 import SwiftUI
 
 struct AudioPlayerView: View {
@@ -25,19 +18,7 @@ struct AudioPlayerView: View {
                 endPoint: .bottom
             )
             .ignoresSafeArea()
-            
-            // Tree silhouettes background
-            VStack {
-                Spacer()
-                HStack(alignment: .bottom, spacing: 0) {
-                    ForEach(0..<16, id: \.self) { i in
-                        TreeSilhouette(height: CGFloat.random(in: 80...160))
-                    }
-                }
-                .opacity(0.25)
-                .frame(height: 180)
-            }
-            .ignoresSafeArea()
+        
             
             ScrollView {
                 VStack(spacing: 0) {

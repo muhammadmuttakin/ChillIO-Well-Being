@@ -1,10 +1,3 @@
-//
-//  MainTabView.swift
-//  ChillIO Well Being
-//
-//  Created by Muhammad Muttakin on 12/03/26.
-//
-
 import SwiftUI
 
 struct MainTabView: View {
@@ -13,7 +6,7 @@ struct MainTabView: View {
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView()
+            HomeView(onSeeMore: { selectedTab = 1 })
                 .environmentObject(onboardingVM)
                 .tabItem {
                     Label("Audio", systemImage: "waveform")

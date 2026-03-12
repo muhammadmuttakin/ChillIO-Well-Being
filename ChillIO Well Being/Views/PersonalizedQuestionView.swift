@@ -1,15 +1,15 @@
 import SwiftUI
+import Combine
 
 struct PersonalizedQuestionsView: View {
     @EnvironmentObject var router: AppRouter
     @EnvironmentObject var vm: OnboardingViewModel
-    
+
     var body: some View {
         ZStack {
-            Color.chillBG.ignoresSafeArea()
-            
+            Color.white.ignoresSafeArea()
+
             VStack(alignment: .leading, spacing: 0) {
-                // Top bar
                 HStack {
                     BackButton { router.goBack() }
                     Spacer()
@@ -17,13 +17,12 @@ struct PersonalizedQuestionsView: View {
                 .padding(.horizontal, ChillDesign.horizontalPad)
                 .padding(.top, 16)
                 .padding(.bottom, 32)
-                
-                // Title
+
                 VStack(alignment: .leading, spacing: 10) {
                     Text("What brings you here,\n\(vm.userName)?")
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(.chillText)
-                    
+
                     Text("Choose one that apply — we'll personalize\nyour experience")
                         .font(.system(size: 14))
                         .foregroundColor(.chillSubtext)
@@ -31,22 +30,18 @@ struct PersonalizedQuestionsView: View {
                 }
                 .padding(.horizontal, ChillDesign.horizontalPad)
                 .padding(.bottom, 32)
-                
-                // Goal options as list
+
                 VStack(spacing: 12) {
                     ForEach(OnboardingGoal.allCases) { goal in
-                        GoalRow(
-                            goal: goal,
-                            isSelected: vm.selectedGoal == goal
-                        ) {
+                        GoalRow(goal: goal, isSelected: vm.selectedGoal == goal) {
                             vm.selectedGoal = goal
                         }
                     }
                 }
                 .padding(.horizontal, ChillDesign.horizontalPad)
-                
+
                 Spacer()
-                
+
                 ChillButton(
                     title: "Continue",
                     isDisabled: vm.selectedGoal == nil
@@ -55,6 +50,7 @@ struct PersonalizedQuestionsView: View {
                     if vm.selectedGoal == .reduceStress {
                         router.navigate(to: .stressType)
                     } else {
+                        vm.completeOnboarding()
                         router.navigate(to: .mainTab)
                     }
                 }
@@ -69,7 +65,7 @@ struct GoalRow: View {
     let goal: OnboardingGoal
     var isSelected: Bool
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 14) {
@@ -77,13 +73,13 @@ struct GoalRow: View {
                     .font(.system(size: 18))
                     .foregroundColor(isSelected ? .white : .chillGreen)
                     .frame(width: 28)
-                
+
                 Text(goal.rawValue)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(isSelected ? .white : .chillText)
-                
+
                 Spacer()
-                
+
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.white)

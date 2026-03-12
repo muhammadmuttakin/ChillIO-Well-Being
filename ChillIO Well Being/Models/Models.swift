@@ -1,10 +1,3 @@
-//
-//  Models.swift
-//  ChillIO Well Being
-//
-//  Created by Muhammad Muttakin on 12/03/26.
-//
-
 import Foundation
 import UIKit
 
@@ -77,13 +70,13 @@ enum AudioCategory: String, CaseIterable {
 // MARK: - Sample Data
 extension AudioItem {
     static let sampleList: [AudioItem] = [
-        AudioItem(type: "Meditation", title: "Calm Morning Breath", description: "Start your day with clarity", duration: 600, category: .stress),
-        AudioItem(type: "Sound Bath",  title: "Forest Rain Therapy", description: "Let nature wash away tension", duration: 900, category: .stress),
-        AudioItem(type: "Guided",      title: "Body Scan Relaxation", description: "Release tension from head to toe", duration: 720, category: .anxious),
-        AudioItem(type: "Music",       title: "Deep Sleep Journey",   description: "Drift into peaceful slumber", duration: 1800, category: .sleep),
-        AudioItem(type: "Meditation",  title: "Anxiety Release",      description: "Gentle techniques for anxious minds", duration: 480, category: .anxious),
-        AudioItem(type: "Binaural",    title: "Focus Flow State",     description: "Enter deep concentration", duration: 1200, category: .focus),
-        AudioItem(type: "Guided",      title: "Self-Compassion Walk", description: "Embrace kindness toward yourself", duration: 540, category: .stress),
-        AudioItem(type: "Sound Bath",  title: "Ocean Waves Healing",  description: "Ride the calming tide", duration: 660, category: .sleep),
+        AudioItem(type: "Meditation", title: "Calm Morning Breath",   description: "Start your day with clarity",             duration: 600,  imageName: "audio_meditation_1",  category: .stress),
+        AudioItem(type: "Sound Bath",  title: "Forest Rain Therapy",  description: "Let nature wash away tension",            duration: 900,  imageName: "audio_soundbath_1",   category: .stress),
+        AudioItem(type: "Guided",      title: "Body Scan Relaxation", description: "Release tension from head to toe",        duration: 720,  imageName: "audio_guided_1",      category: .anxious),
+        AudioItem(type: "Music",       title: "Deep Sleep Journey",   description: "Drift into peaceful slumber",             duration: 1800, imageName: "audio_sleep_1",       category: .sleep),
+        AudioItem(type: "Meditation",  title: "Anxiety Release",      description: "Gentle techniques for anxious minds",    duration: 480,  imageName: "audio_meditation_2",  category: .anxious),
+        AudioItem(type: "Binaural",    title: "Focus Flow State",     description: "Enter deep concentration",               duration: 1200, imageName: "audio_binaural_1",    category: .focus),
+        AudioItem(type: "Guided",      title: "Self-Compassion Walk", description: "Embrace kindness toward yourself",       duration: 540,  imageName: "audio_guided_2",      category: .stress),
+        AudioItem(type: "Sound Bath",  title: "Ocean Waves Healing",  description: "Ride the calming tide",                  duration: 660,  imageName: "audio_soundbath_2",   category: .sleep),
     ]
 }

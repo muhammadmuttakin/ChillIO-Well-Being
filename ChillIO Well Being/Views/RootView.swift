@@ -1,21 +1,15 @@
-//
-//  RootView.swift
-//  ChillIO Well Being
-//
-//  Created by Muhammad Muttakin on 12/03/26.
-//
-
 import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject var router: AppRouter
     @StateObject var onboardingVM = OnboardingViewModel()
-    
+
     var body: some View {
         Group {
             switch router.currentScreen {
             case .splash:
-                SplashView()
+                SplashViewContainer()
+                    .environmentObject(onboardingVM)
             case .splashAction:
                 SplashActionView()
             case .inputName:
@@ -26,6 +20,12 @@ struct RootView: View {
                     .environmentObject(onboardingVM)
             case .stressType:
                 StressTypeView()
+                    .environmentObject(onboardingVM)
+            case .dailyQuestion:
+                DailyQuestionView()
+                    .environmentObject(onboardingVM)
+            case .dailyStressType:
+                DailyStressTypeView()
                     .environmentObject(onboardingVM)
             case .mainTab:
                 MainTabView()

@@ -1,10 +1,3 @@
-//
-//  HomeView.swift
-//  ChillIO Well Being
-//
-//  Created by Muhammad Muttakin on 12/03/26.
-//
-
 import SwiftUI
 
 struct HomeView: View {
@@ -12,7 +5,8 @@ struct HomeView: View {
     @StateObject private var vm = HomeViewModel()
     @State private var showPlayer = false
     @State private var selectedAudio: AudioItem?
-    
+    var onSeeMore: (() -> Void)? = nil
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -31,30 +25,15 @@ struct HomeView: View {
                         }
                         .padding(20)
                     }
-                    
                     // Tailored For You section
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Tailored For You")
                             .font(.system(size: 20, weight: .bold))
                             .foregroundColor(.chillText)
                         
-                        // Category chips
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 8) {
-                                CategoryChip(title: "All", isSelected: vm.selectedCategory == nil) {
-                                    vm.selectedCategory = nil
-                                }
-                                ForEach(AudioCategory.allCases, id: \.self) { cat in
-                                    CategoryChip(title: cat.rawValue, isSelected: vm.selectedCategory == cat) {
-                                        vm.selectedCategory = cat
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Audio list
+                        // Audio list — no category filter
                         VStack(spacing: 10) {
-                            ForEach(vm.filteredAudio.prefix(4)) { item in
+                            ForEach(vm.audioList.prefix(4)) { item in
                                 AudioRowCard(item: item) {
                                     selectedAudio = item
                                     showPlayer = true
@@ -62,12 +41,14 @@ struct HomeView: View {
                             }
                         }
                         
-                        // See More
+                        // See More → navigate to Discover tab
                         HStack {
                             Spacer()
-                            Button("See More") {}
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.chillGreen)
+                            Button("See More") {
+                                onSeeMore?()
+                            }
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.chillGreen)
                             Spacer()
                         }
                         .padding(.top, 4)

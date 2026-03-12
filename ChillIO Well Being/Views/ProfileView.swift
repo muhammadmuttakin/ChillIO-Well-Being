@@ -1,10 +1,3 @@
-//
-//  ProfileView.swift
-//  ChillIO Well Being
-//
-//  Created by Muhammad Muttakin on 12/03/26.
-//
-
 import SwiftUI
 
 struct ProfileView: View {
@@ -72,7 +65,7 @@ struct ProfileView: View {
                         Image(systemName: "flame.fill")
                             .font(.system(size: 22))
                             .foregroundColor(.orange)
-                        Text("\(vm.userProfile.dayStreak)")
+                        Text("\(vm.streakCount)")
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.chillText)
                         Text("Day Streak")

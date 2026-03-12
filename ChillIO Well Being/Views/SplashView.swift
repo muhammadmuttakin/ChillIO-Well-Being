@@ -1,45 +1,47 @@
-//
-//  SplashView.swift
-//  ChillIO Well Being
-//
-//  Created by Muhammad Muttakin on 12/03/26.
-//
-
 import SwiftUI
 
-struct SplashView: View {
+// MARK: - Splash (logo only, auto-redirect)
+struct SplashViewContainer: View {
     @EnvironmentObject var router: AppRouter
-    
+    @EnvironmentObject var vm: OnboardingViewModel
+    @State private var opacity: Double = 0
+
     var body: some View {
         ZStack {
-            Color.chillBG.ignoresSafeArea()
-            
-            VStack {
-                Spacer()
+            Color.white.ignoresSafeArea()
+            VStack(spacing: 12) {
                 LogoView()
-                Spacer()
+                Text("daily audio to ease your mind.")
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(.chillSubtext)
             }
+            .opacity(opacity)
         }
         .onAppear {
+            withAnimation(.easeIn(duration: 0.5)) {
+                opacity = 1
+            }
+            vm.handleAppOpen()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
-                router.navigate(to: .splashAction)
+                let ud = UserDefaultsManager.shared
+                if !ud.hasCompletedOnboarding {
+                    router.navigate(to: .splashAction)
+                } else if ud.shouldShowDailyQuestion {
+                    router.navigate(to: .dailyQuestion)
+                } else {
+                    router.navigate(to: .mainTab)
+                }
             }
         }
     }
 }
 
+// MARK: - Logo
 struct LogoView: View {
     var body: some View {
-        VStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 18)
-                .fill(Color.chillGreen)
-                .frame(width: 110, height: 110)
-                .overlay(
-                    Text("chill.io")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
-                )
-                .shadow(color: Color.chillGreen.opacity(0.4), radius: 20, x: 0, y: 8)
-        }
+        Image("AppLogo")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 160, height: 160)
     }
 }
