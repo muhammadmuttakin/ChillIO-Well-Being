@@ -50,33 +50,143 @@ enum StressType: String, CaseIterable, Identifiable {
 }
 
 // MARK: - Audio Item
-struct AudioItem: Identifiable {
-    let id: UUID = UUID()
+struct AudioItem: Identifiable, Equatable {
+    let id: String
     var type: String
     var title: String
     var description: String
     var duration: Double      // seconds
     var imageName: String?
     var category: AudioCategory
+    /// Relative path in app bundle (e.g. "Audio/Anxious/file.aac") for playback
+    var bundlePath: String?
+
+    init(id: String? = nil, type: String, title: String, description: String, duration: Double, imageName: String? = nil, category: AudioCategory, bundlePath: String? = nil) {
+        self.id = id ?? UUID().uuidString
+        self.type = type
+        self.title = title
+        self.description = description
+        self.duration = duration
+        self.imageName = imageName
+        self.category = category
+        self.bundlePath = bundlePath
+    }
+
+    static func == (lhs: AudioItem, rhs: AudioItem) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 enum AudioCategory: String, CaseIterable {
     case stress    = "Stress"
     case anxious   = "Anxious"
     case sleep     = "Sleep"
-    case focus     = "Focus"
+    case selfEsteem = "Self Esteem"
+    
+    /// SF Symbol name for list/player icon per category
+    var iconName: String {
+        switch self {
+        case .stress:     return "leaf.fill"
+        case .anxious:    return "brain.head.profile"
+        case .sleep:      return "moon.fill"
+        case .selfEsteem: return "heart.fill"
+        }
+    }
 }
 
-// MARK: - Sample Data
+// MARK: - Onboarding Goal → Audio Category (for Home filtering)
+extension OnboardingGoal {
+    var audioCategory: AudioCategory? {
+        switch self {
+        case .reduceStress:    return .stress
+        case .reduceAnxiety:   return .anxious
+        case .betterSleep:     return .sleep
+        case .buildSelfEsteem: return .selfEsteem
+        }
+    }
+}
+
+// MARK: - Bundle Loader (audio from bundle — works with any Copy Bundle Resources layout)
 extension AudioItem {
-    static let sampleList: [AudioItem] = [
-        AudioItem(type: "Meditation", title: "Calm Morning Breath",   description: "Start your day with clarity",             duration: 600,  imageName: "audio_meditation_1",  category: .stress),
-        AudioItem(type: "Sound Bath",  title: "Forest Rain Therapy",  description: "Let nature wash away tension",            duration: 900,  imageName: "audio_soundbath_1",   category: .stress),
-        AudioItem(type: "Guided",      title: "Body Scan Relaxation", description: "Release tension from head to toe",        duration: 720,  imageName: "audio_guided_1",      category: .anxious),
-        AudioItem(type: "Music",       title: "Deep Sleep Journey",   description: "Drift into peaceful slumber",             duration: 1800, imageName: "audio_sleep_1",       category: .sleep),
-        AudioItem(type: "Meditation",  title: "Anxiety Release",      description: "Gentle techniques for anxious minds",    duration: 480,  imageName: "audio_meditation_2",  category: .anxious),
-        AudioItem(type: "Binaural",    title: "Focus Flow State",     description: "Enter deep concentration",               duration: 1200, imageName: "audio_binaural_1",    category: .focus),
-        AudioItem(type: "Guided",      title: "Self-Compassion Walk", description: "Embrace kindness toward yourself",       duration: 540,  imageName: "audio_guided_2",      category: .stress),
-        AudioItem(type: "Sound Bath",  title: "Ocean Waves Healing",  description: "Ride the calming tide",                  duration: 660,  imageName: "audio_soundbath_2",   category: .sleep),
-    ]
+    private static let audioExtensions = ["aac", "m4a", "mp3"]
+
+    /// Loads all audio files from the app bundle by scanning the entire bundle recursively.
+    /// Works whether Xcode copies files under "Audio/", "ChillIO Well Being/Audio/", or flat.
+    static func loadFromBundle() -> [AudioItem] {
+        let fileManager = FileManager.default
+        let bundleRoot = Bundle.main.bundleURL
+        let bundleRootPath = bundleRoot.path
+        let normalizedRoot = bundleRootPath.hasSuffix("/") ? bundleRootPath : bundleRootPath + "/"
+
+        var items: [AudioItem] = []
+
+        guard let enumerator = fileManager.enumerator(
+            at: bundleRoot,
+            includingPropertiesForKeys: [.isRegularFileKey],
+            options: [.skipsHiddenFiles]
+        ) else { return [] }
+
+        while let url = enumerator.nextObject() as? URL {
+            let ext = url.pathExtension.lowercased()
+            guard Self.audioExtensions.contains(ext) else { continue }
+
+            var isRegular = false
+            (try? url.resourceValues(forKeys: [.isRegularFileKey]))?.isRegularFile.map { isRegular = $0 }
+            if !isRegular { continue }
+
+            let fullPath = url.path
+            let bundlePath = fullPath.hasPrefix(normalizedRoot)
+                ? String(fullPath.dropFirst(normalizedRoot.count))
+                : url.lastPathComponent
+
+            let category = categoryFromPath(bundlePath)
+
+            let rawTitle = url.deletingPathExtension().lastPathComponent
+            let title = rawTitle
+                .replacingOccurrences(of: "_", with: " ")
+                .replacingOccurrences(of: "  ", with: " ")
+
+            let item = AudioItem(
+                id: bundlePath,
+                type: category.rawValue,
+                title: title,
+                description: "Relax and unwind",
+                duration: 0,
+                imageName: nil,
+                category: category,
+                bundlePath: bundlePath
+            )
+            items.append(item)
+        }
+
+        return items.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+    }
+
+    /// Infers category from path (e.g. "Audio/Anxious/file.aac" → .anxious).
+    private static func categoryFromPath(_ path: String) -> AudioCategory {
+        let lower = path.lowercased()
+        if lower.contains("anxious") { return .anxious }
+        if lower.contains("bettersleep") { return .sleep }
+        if lower.contains("selfesteem") { return .selfEsteem }
+        if lower.contains("stress") || lower.contains("financial") || lower.contains("grief")
+            || lower.contains("relationship") || lower.contains("/work") || lower.contains("work/") { return .stress }
+        return .stress
+    }
+
+    /// Resolves bundle path to a file URL for playback (supports paths with subfolders).
+    static func urlInBundle(for bundlePath: String) -> URL? {
+        let fileManager = FileManager.default
+        let base = Bundle.main.bundleURL
+        let trimmed = bundlePath.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        var built = base
+        for component in trimmed.split(separator: "/") {
+            built = built.appendingPathComponent(String(component))
+        }
+        return fileManager.fileExists(atPath: built.path) ? built : nil
+    }
+
+    /// All audio from bundle (any layout).
+    static var allAudio: [AudioItem] {
+        loadFromBundle()
+    }
 }

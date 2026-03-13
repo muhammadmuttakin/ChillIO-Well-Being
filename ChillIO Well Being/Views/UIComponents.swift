@@ -67,13 +67,14 @@ struct AudioRowCard: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                // Thumbnail
+                // Thumbnail — icon by audio category
                 RoundedRectangle(cornerRadius: 8)
                     .fill(isDark ? Color.chillCardDark : Color.gray.opacity(0.15))
                     .frame(width: 56, height: 56)
                     .overlay(
-                        Image(systemName: "waveform")
-                            .foregroundColor(isDark ? .white.opacity(0.5) : .gray.opacity(0.4))
+                        Image(systemName: item.category.iconName)
+                            .font(.system(size: 24))
+                            .foregroundColor(isDark ? .white.opacity(0.7) : .chillGreen)
                     )
                 
                 VStack(alignment: .leading, spacing: 3) {

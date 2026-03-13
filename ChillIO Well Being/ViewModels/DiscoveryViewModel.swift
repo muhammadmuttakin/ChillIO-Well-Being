@@ -10,8 +10,17 @@ import Combine
 
 class DiscoverViewModel: ObservableObject {
     @Published var selectedCategory: String? = nil
-    @Published var allAudio: [AudioItem] = AudioItem.sampleList
-    
+    @Published var allAudio: [AudioItem] = []
+
+    init() {
+        allAudio = AudioItem.allAudio
+    }
+
+    /// Reload list from bundle (call on appear so real files are shown).
+    func refresh() {
+        allAudio = AudioItem.allAudio
+    }
+
     var categories: [String] { AudioCategory.allCases.map { $0.rawValue } }
     
     var filteredAudio: [AudioItem] {

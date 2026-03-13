@@ -14,6 +14,7 @@ struct MainTabView: View {
                 .tag(0)
             
             DiscoverView()
+                .environmentObject(onboardingVM)
                 .tabItem {
                     Label("Discover", systemImage: "safari")
                 }

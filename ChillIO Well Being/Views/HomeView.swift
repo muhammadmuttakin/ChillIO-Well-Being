@@ -3,9 +3,14 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var onboardingVM: OnboardingViewModel
     @StateObject private var vm = HomeViewModel()
-    @State private var showPlayer = false
     @State private var selectedAudio: AudioItem?
     var onSeeMore: (() -> Void)? = nil
+
+    /// Audio filtered by onboarding goal only; if no goal, show all
+    private var audioForGoal: [AudioItem] {
+        guard let category = onboardingVM.selectedGoal?.audioCategory else { return vm.audioList }
+        return vm.audioList.filter { $0.category == category }
+    }
 
     var body: some View {
         NavigationView {
@@ -31,12 +36,11 @@ struct HomeView: View {
                             .font(.system(size: 20, weight: .bold))
                             .foregroundColor(.chillText)
                         
-                        // Audio list — no category filter
+                        // Audio list — only matching onboarding goal, no filter pills
                         VStack(spacing: 10) {
-                            ForEach(vm.audioList.prefix(4)) { item in
+                            ForEach(audioForGoal.prefix(4)) { item in
                                 AudioRowCard(item: item) {
                                     selectedAudio = item
-                                    showPlayer = true
                                 }
                             }
                         }
@@ -62,10 +66,10 @@ struct HomeView: View {
             .ignoresSafeArea(edges: .top)
             .navigationBarHidden(true)
         }
-        .fullScreenCover(isPresented: $showPlayer) {
-            if let audio = selectedAudio {
-                AudioPlayerView(audio: audio)
-            }
+        .onAppear { vm.refresh() }
+        .fullScreenCover(item: $selectedAudio) { audio in
+            AudioPlayerView(audio: audio)
+                .environmentObject(onboardingVM)
         }
     }
 }

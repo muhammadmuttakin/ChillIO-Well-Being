@@ -2,9 +2,15 @@ import SwiftUI
 
 struct AudioPlayerView: View {
     let audio: AudioItem
+    @EnvironmentObject var onboardingVM: OnboardingViewModel
     @StateObject private var vm = AudioPlayerViewModel()
     @Environment(\.dismiss) var dismiss
-    
+
+    /// Title from onboarding goal for background (e.g. "Reduce Stress", "Better Sleep")
+    private var goalTitle: String {
+        onboardingVM.selectedGoal?.rawValue ?? audio.category.rawValue
+    }
+
     var body: some View {
         ZStack {
             // Forest background
@@ -18,8 +24,7 @@ struct AudioPlayerView: View {
                 endPoint: .bottom
             )
             .ignoresSafeArea()
-        
-            
+
             ScrollView {
                 VStack(spacing: 0) {
                     // Back button
@@ -39,15 +44,18 @@ struct AudioPlayerView: View {
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 20)
-                    
-                    // Title
-                    VStack(spacing: 8) {
+
+                    // Background title from onboarding goal
+                    VStack(spacing: 6) {
+                        Text(goalTitle)
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.9))
                         Text(audio.title)
-                            .font(.system(size: 30, weight: .bold))
+                            .font(.system(size: 28, weight: .bold))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                     }
-                    .padding(.top, 40)
+                    .padding(.top, 24)
                     .padding(.horizontal, 32)
                     
                     // Waveform
