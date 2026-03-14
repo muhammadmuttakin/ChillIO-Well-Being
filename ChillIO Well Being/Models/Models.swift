@@ -44,9 +44,19 @@ enum StressType: String, CaseIterable, Identifiable {
     case work         = "Stress of working"
     case relationship = "Stress of relationship"
     case financial    = "Stress of financial"
-    case health       = "Stress of health"
+    case grief        = "Stress of grief"
     
     var id: String { rawValue }
+
+    /// Maps to the audio subcategory tag used in filenames.
+    var audioSubCategory: AudioSubCategory {
+        switch self {
+        case .work:         return .work
+        case .relationship: return .relationship
+        case .financial:    return .financial
+        case .grief:        return .grief
+        }
+    }
 }
 
 // MARK: - Audio Item
@@ -58,10 +68,11 @@ struct AudioItem: Identifiable, Equatable {
     var duration: Double      // seconds
     var imageName: String?
     var category: AudioCategory
+    var subCategory: AudioSubCategory
     /// Relative path in app bundle (e.g. "Audio/Anxious/file.aac") for playback
     var bundlePath: String?
 
-    init(id: String? = nil, type: String, title: String, description: String, duration: Double, imageName: String? = nil, category: AudioCategory, bundlePath: String? = nil) {
+    init(id: String? = nil, type: String, title: String, description: String, duration: Double, imageName: String? = nil, category: AudioCategory, subCategory: AudioSubCategory = .none, bundlePath: String? = nil) {
         self.id = id ?? UUID().uuidString
         self.type = type
         self.title = title
@@ -69,6 +80,7 @@ struct AudioItem: Identifiable, Equatable {
         self.duration = duration
         self.imageName = imageName
         self.category = category
+        self.subCategory = subCategory
         self.bundlePath = bundlePath
     }
 
@@ -92,6 +104,14 @@ enum AudioCategory: String, CaseIterable {
         case .selfEsteem: return "heart.fill"
         }
     }
+}
+
+enum AudioSubCategory: String, CaseIterable {
+    case none         = "none"
+    case work         = "work"
+    case financial    = "financial"
+    case grief        = "grief"
+    case relationship = "relationship"
 }
 
 // MARK: - Onboarding Goal → Audio Category (for Home filtering)
@@ -139,21 +159,23 @@ extension AudioItem {
                 ? String(fullPath.dropFirst(normalizedRoot.count))
                 : url.lastPathComponent
 
-            let category = categoryFromPath(bundlePath)
+            // Parse category + subcategory from filename prefix
+            let filename = url.deletingPathExtension().lastPathComponent
+            let parsed = parseFilenamePrefix(filename)
 
-            let rawTitle = url.deletingPathExtension().lastPathComponent
-            let title = rawTitle
+            let title = parsed.title
                 .replacingOccurrences(of: "_", with: " ")
                 .replacingOccurrences(of: "  ", with: " ")
 
             let item = AudioItem(
                 id: bundlePath,
-                type: category.rawValue,
+                type: parsed.category.rawValue,
                 title: title,
                 description: "Relax and unwind",
                 duration: 0,
                 imageName: nil,
-                category: category,
+                category: parsed.category,
+                subCategory: parsed.subCategory,
                 bundlePath: bundlePath
             )
             items.append(item)
@@ -162,15 +184,42 @@ extension AudioItem {
         return items.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
     }
 
-    /// Infers category from path (e.g. "Audio/Anxious/file.aac" → .anxious).
-    private static func categoryFromPath(_ path: String) -> AudioCategory {
-        let lower = path.lowercased()
-        if lower.contains("anxious") { return .anxious }
-        if lower.contains("bettersleep") { return .sleep }
-        if lower.contains("selfesteem") { return .selfEsteem }
-        if lower.contains("stress") || lower.contains("financial") || lower.contains("grief")
-            || lower.contains("relationship") || lower.contains("/work") || lower.contains("work/") { return .stress }
-        return .stress
+    /// Parses the filename prefix to extract category, subcategory, and clean title.
+    ///
+    /// Filename format: `category_subcategory_rest_of_title`
+    /// Examples:
+    ///   - `stress_work_work_home_by_fat_bunny`   → (.stress, .work, "work_home_by_fat_bunny")
+    ///   - `anxious_none_drill_buzz_by_stocktune` → (.anxious, .none, "drill_buzz_by_stocktune")
+    private static func parseFilenamePrefix(_ filename: String) -> (category: AudioCategory, subCategory: AudioSubCategory, title: String) {
+        let parts = filename.split(separator: "_", maxSplits: 2).map(String.init)
+        guard parts.count >= 3 else {
+            // Fallback: can't parse prefix, treat entire filename as title
+            return (.stress, .none, filename)
+        }
+
+        let catRaw = parts[0].lowercased()
+        let subRaw = parts[1].lowercased()
+        let title  = parts[2]
+
+        let category: AudioCategory
+        switch catRaw {
+        case "stress":      category = .stress
+        case "anxious":     category = .anxious
+        case "bettersleep": category = .sleep
+        case "selfesteem":  category = .selfEsteem
+        default:            category = .stress
+        }
+
+        let subCategory: AudioSubCategory
+        switch subRaw {
+        case "work":         subCategory = .work
+        case "financial":    subCategory = .financial
+        case "grief":        subCategory = .grief
+        case "relationship": subCategory = .relationship
+        default:             subCategory = .none
+        }
+
+        return (category, subCategory, title)
     }
 
     /// Resolves bundle path to a file URL for playback (supports paths with subfolders).

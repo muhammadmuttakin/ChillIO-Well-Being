@@ -54,7 +54,7 @@ struct DiscoverView: View {
         }
         .onAppear { vm.refresh() }
         .fullScreenCover(item: $selectedAudio) { audio in
-            AudioPlayerView(audio: audio)
+            AudioPlayerView(audio: audio, source: .discover)
                 .environmentObject(onboardingVM)
         }
     }

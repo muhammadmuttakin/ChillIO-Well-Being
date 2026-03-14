@@ -1,20 +1,19 @@
-//
-//  AudioPlayerViewModel.swift
-//  ChillIO Well Being
-//
-//  Created by Muhammad Muttakin on 12/03/26.
-//
-
 import SwiftUI
 import Combine
 import AVFoundation
+
+/// Where the user opened AudioPlayerView from.
+enum AudioPlayerSource {
+    case home      // recommendations match the current audio's category/subcategory
+    case discover  // recommendations span all audio
+}
 
 class AudioPlayerViewModel: ObservableObject {
     @Published var isPlaying: Bool = false
     @Published var currentTime: Double = 0
     @Published var duration: Double = 600
     @Published var currentAudio: AudioItem?
-    @Published var recommendations: [AudioItem] = Array(AudioItem.allAudio.prefix(3))
+    @Published var recommendations: [AudioItem] = []
 
     private var timer: AnyCancellable?
     private var player: AVPlayer?
@@ -29,12 +28,28 @@ class AudioPlayerViewModel: ObservableObject {
     var currentTimeString: String { formatTime(currentTime) }
     var durationString: String { formatTime(duration) }
 
-    func load(_ audio: AudioItem) {
+    func load(_ audio: AudioItem, source: AudioPlayerSource = .discover) {
         stopPlayback()
         currentAudio = audio
         currentTime = 0
         isPlaying = false
-        recommendations = AudioItem.allAudio.filter { $0.id != audio.id }
+
+        // Build recommendations based on source
+        let pool: [AudioItem]
+        switch source {
+        case .home:
+            // Same category; for stress also match subcategory
+            pool = AudioItem.allAudio.filter { item in
+                guard item.id != audio.id else { return false }
+                if audio.category == .stress {
+                    return item.category == audio.category && item.subCategory == audio.subCategory
+                }
+                return item.category == audio.category
+            }
+        case .discover:
+            pool = AudioItem.allAudio.filter { $0.id != audio.id }
+        }
+        recommendations = Array(pool.shuffled().prefix(2))
 
         if let path = audio.bundlePath, let url = AudioItem.urlInBundle(for: path) {
             configureAudioSession()
