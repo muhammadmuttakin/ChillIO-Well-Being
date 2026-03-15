@@ -98,10 +98,10 @@ enum AudioCategory: String, CaseIterable {
     /// SF Symbol name for list/player icon per category
     var iconName: String {
         switch self {
-        case .stress:     return "leaf.fill"
-        case .anxious:    return "brain.head.profile"
-        case .sleep:      return "moon.fill"
-        case .selfEsteem: return "heart.fill"
+        case .stress:     return "apple.meditate"
+        case .anxious:    return "figure.mind.and.body.circle"
+        case .sleep:      return "moon.stars"
+        case .selfEsteem: return "figure.stair.stepper"
         }
     }
 }
