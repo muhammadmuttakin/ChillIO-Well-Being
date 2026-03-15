@@ -26,6 +26,8 @@ struct SplashViewContainer: View {
                 let ud = UserDefaultsManager.shared
                 if !ud.hasCompletedOnboarding {
                     router.navigate(to: .splashAction)
+                } else if vm.didStreakIncrease {
+                    router.navigate(to: .streak)
                 } else if ud.shouldShowDailyQuestion {
                     router.navigate(to: .dailyQuestion)
                 } else {

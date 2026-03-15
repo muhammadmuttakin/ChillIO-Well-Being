@@ -48,7 +48,7 @@ struct AudioPlayerView: View {
                         Text(goalTitle)
                             .font(.system(size: 22, weight: .semibold))
                             .foregroundColor(.white.opacity(0.9))
-                        Text(audio.title)
+                        Text(audio.title.localizedCapitalized)
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)

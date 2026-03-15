@@ -65,19 +65,30 @@ class UserDefaultsManager {
     }
 
     @discardableResult
-    func handleAppOpen() -> Int {
+    func handleAppOpen() -> (count: Int, didIncrease: Bool) {
         let cal   = Calendar.current
         let today = cal.startOfDay(for: Date())
+        var didIncrease = false
+        
         if let last = lastOpenDate {
             let lastDay = cal.startOfDay(for: last)
-            if cal.isDate(lastDay, inSameDayAs: today) { return streakCount }
+            if cal.isDate(lastDay, inSameDayAs: today) { 
+                return (streakCount, false) 
+            }
             let diff = cal.dateComponents([.day], from: lastDay, to: today).day ?? 0
-            streakCount = diff == 1 ? streakCount + 1 : 1
+            if diff == 1 {
+                streakCount += 1
+                didIncrease = true
+            } else {
+                streakCount = 1
+                didIncrease = true
+            }
         } else {
             streakCount = 1
+            didIncrease = true
         }
         lastOpenDate = today
-        return streakCount
+        return (streakCount, didIncrease)
     }
 
     // MARK: - Daily Question

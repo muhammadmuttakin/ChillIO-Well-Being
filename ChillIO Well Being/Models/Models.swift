@@ -129,6 +129,21 @@ extension OnboardingGoal {
 // MARK: - Bundle Loader (audio from bundle — works with any Copy Bundle Resources layout)
 extension AudioItem {
     private static let audioExtensions = ["aac", "m4a", "mp3"]
+    var contextualDescription: String {
+        switch category {
+        case .anxious: return "Calm your racing mind"
+        case .sleep: return "Drift into deep rest"
+        case .selfEsteem: return "Feel comfortable with yourself"
+        case .stress:
+            switch subCategory {
+            case .work: return "Release work tension"
+            case .financial: return "Ease financial worry"
+            case .grief: return "Heal with gentleness"
+            case .relationship: return "Restore inner peace"
+            default: return "Relax and unwind"
+            }
+        }
+    }
 
     /// Loads all audio files from the app bundle by scanning the entire bundle recursively.
     /// Works whether Xcode copies files under "Audio/", "ChillIO Well Being/Audio/", or flat.

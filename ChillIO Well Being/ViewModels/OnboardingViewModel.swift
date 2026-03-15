@@ -10,6 +10,8 @@ class OnboardingViewModel: ObservableObject {
     @Published var showImagePicker: Bool = false
     @Published var streakCount:     Int = 0
 
+    @Published var didStreakIncrease: Bool = false
+
     private let ud = UserDefaultsManager.shared
 
     init() { load() }
@@ -72,9 +74,10 @@ class OnboardingViewModel: ObservableObject {
     }
 
     func handleAppOpen() {
-        let updated           = ud.handleAppOpen()
-        streakCount           = updated
-        userProfile.dayStreak = updated
+        let result            = ud.handleAppOpen()
+        streakCount           = result.count
+        userProfile.dayStreak = result.count
+        didStreakIncrease     = result.didIncrease
     }
 
     /// Update goal dari daily question, tandai sudah ditanya hari ini

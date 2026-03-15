@@ -88,10 +88,10 @@ struct AudioRowCard: View {
                     Text(item.type)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(isDark ? .white.opacity(0.6) : .chillSubtext)
-                    Text(item.title)
+                    Text(item.title.capitalized)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(isDark ? .white : .chillText)
-                    Text(item.description)
+                    Text(item.contextualDescription)
                         .font(.system(size: 12))
                         .foregroundColor(isDark ? .white.opacity(0.5) : .chillSubtext)
                 }

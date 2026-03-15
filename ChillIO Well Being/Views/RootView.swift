@@ -27,6 +27,9 @@ struct RootView: View {
             case .dailyStressType:
                 DailyStressTypeView()
                     .environmentObject(onboardingVM)
+            case .streak:
+                StreakScreenView()
+                    .environmentObject(onboardingVM)
             case .mainTab:
                 MainTabView()
                     .environmentObject(onboardingVM)

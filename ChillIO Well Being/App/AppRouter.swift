@@ -9,6 +9,7 @@ enum AppScreen {
     case stressType
     case dailyQuestion
     case dailyStressType   // stress type khusus dari daily question
+    case streak
     case mainTab
 }
 
