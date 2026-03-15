@@ -16,7 +16,7 @@ struct DiscoverView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 0) {
-                    // Banner
+                    // Banner with Hiragino Font
                     ForestBannerView(height: 160, title: "Discover")
                     
                     VStack(alignment: .leading, spacing: 16) {
@@ -27,7 +27,11 @@ struct DiscoverView: View {
                                     vm.selectedCategory = nil
                                 }
                                 ForEach(vm.categories, id: \.self) { cat in
-                                    CategoryChip(title: cat, isSelected: vm.selectedCategory == cat) {
+                                    CategoryChip(
+                                        title: cat,
+                                        iconName: AudioCategory(rawValue: cat)?.iconName,
+                                        isSelected: vm.selectedCategory == cat
+                                    ) {
                                         vm.selectedCategory = cat
                                     }
                                 }

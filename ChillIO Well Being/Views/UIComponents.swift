@@ -39,21 +39,28 @@ struct BackButton: View {
 // MARK: - Category Chip
 struct CategoryChip: View {
     let title: String
+    var iconName: String? = nil
     var isSelected: Bool = false
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(isSelected ? .white : .chillText)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 7)
-                .background(isSelected ? Color.chillGreen : Color.white)
-                .overlay(
-                    Capsule().stroke(Color.gray.opacity(0.25), lineWidth: 1)
-                )
-                .clipShape(Capsule())
+            HStack(spacing: 6) {
+                if let iconName = iconName {
+                    Image(systemName: iconName)
+                        .font(.system(size: 13, weight: .medium))
+                }
+                Text(title)
+                    .font(.system(size: 13, weight: .medium))
+            }
+            .foregroundColor(isSelected ? .white : .chillText)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 7)
+            .background(isSelected ? Color.chillGreen : Color.white)
+            .overlay(
+                Capsule().stroke(Color.gray.opacity(0.25), lineWidth: 1)
+            )
+            .clipShape(Capsule())
         }
     }
 }

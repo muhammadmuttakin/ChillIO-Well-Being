@@ -37,7 +37,7 @@ struct HomeView: View {
                                 .font(.system(size: 14, weight: .regular))
                                 .foregroundColor(.white.opacity(0.8))
                             Text("Hi, \(onboardingVM.userName)")
-                                .font(.system(size: 26, weight: .bold))
+                                .font(.custom("HiraMinProN-W6", size: 26))
                                 .foregroundColor(.white)
                         }
                         .padding(20)
@@ -81,6 +81,7 @@ struct HomeView: View {
                             }
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.chillGreen)
+                            .underline()
                             Spacer()
                         }
                         .padding(.top, 4)

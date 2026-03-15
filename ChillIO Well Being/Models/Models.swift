@@ -22,10 +22,10 @@ enum OnboardingGoal: String, CaseIterable, Identifiable {
     
     var iconName: String {
         switch self {
-        case .reduceStress:    return "leaf.fill"
-        case .reduceAnxiety:   return "plus.circle"
-        case .betterSleep:     return "moon.fill"
-        case .buildSelfEsteem: return "figure.walk"
+        case .reduceStress:    return "apple.meditate"
+        case .reduceAnxiety:   return "figure.mind.and.body.circle"
+        case .betterSleep:     return "moon.stars"
+        case .buildSelfEsteem: return "figure.stair.stepper"
         }
     }
     
