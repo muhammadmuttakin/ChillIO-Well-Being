@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct DiscoverView: View {
+    @EnvironmentObject var onboardingVM: OnboardingViewModel
     @StateObject private var vm = DiscoverViewModel()
-    @State private var showPlayer = false
     @State private var selectedAudio: AudioItem?
-    
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -43,7 +43,6 @@ struct DiscoverView: View {
                             ForEach(vm.filteredAudio) { item in
                                 AudioRowCard(item: item) {
                                     selectedAudio = item
-                                    showPlayer = true
                                 }
                             }
                         }
@@ -57,10 +56,10 @@ struct DiscoverView: View {
             .ignoresSafeArea(edges: .top)
             .navigationBarHidden(true)
         }
-        .fullScreenCover(isPresented: $showPlayer) {
-            if let audio = selectedAudio {
-                AudioPlayerView(audio: audio)
-            }
+        .onAppear { vm.refresh() }
+        .fullScreenCover(item: $selectedAudio) { audio in
+            AudioPlayerView(audio: audio, source: .discover)
+                .environmentObject(onboardingVM)
         }
     }
 }

@@ -10,16 +10,26 @@ import Combine
 
 class HomeViewModel: ObservableObject {
     @Published var selectedCategory: AudioCategory? = nil
-    @Published var audioList: [AudioItem] = AudioItem.sampleList
+    @Published var audioList: [AudioItem] = []
+
+    init() {
+        audioList = AudioItem.allAudio
+    }
+
     @Published var selectedAudio: AudioItem? = nil
     @Published var showAudioPlayer: Bool = false
-    
+
+    /// Reload list from bundle (call on appear so real files are shown).
+    func refresh() {
+        audioList = AudioItem.allAudio
+    }
+
     var filteredAudio: [AudioItem] {
         guard let cat = selectedCategory else { return audioList }
         return audioList.filter { $0.category == cat }
     }
     
-    var categories: [String] { ["Stress", "Anxious", "Sleep", "Self-Esteem"] }
+    var categories: [String] { AudioCategory.allCases.map { $0.rawValue } }
     
     func selectAudio(_ item: AudioItem) {
         selectedAudio = item

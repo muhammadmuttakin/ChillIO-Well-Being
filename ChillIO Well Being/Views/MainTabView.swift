@@ -2,18 +2,21 @@ import SwiftUI
 
 struct MainTabView: View {
     @EnvironmentObject var onboardingVM: OnboardingViewModel
+    @EnvironmentObject var router: AppRouter
     @State private var selectedTab: Int = 0
     
     var body: some View {
         TabView(selection: $selectedTab) {
             HomeView(onSeeMore: { selectedTab = 1 })
                 .environmentObject(onboardingVM)
+                .environmentObject(router)
                 .tabItem {
                     Label("Audio", systemImage: "waveform")
                 }
                 .tag(0)
             
             DiscoverView()
+                .environmentObject(onboardingVM)
                 .tabItem {
                     Label("Discover", systemImage: "safari")
                 }
@@ -38,3 +41,4 @@ struct MainTabView: View {
         }
     }
 }
+

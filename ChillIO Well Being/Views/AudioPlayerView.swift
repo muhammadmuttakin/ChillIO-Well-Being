@@ -2,23 +2,26 @@ import SwiftUI
 
 struct AudioPlayerView: View {
     let audio: AudioItem
+    var source: AudioPlayerSource = .discover
+    @EnvironmentObject var onboardingVM: OnboardingViewModel
     @StateObject private var vm = AudioPlayerViewModel()
     @Environment(\.dismiss) var dismiss
-    
+
+    /// Title from onboarding goal for background (e.g. "Reduce Stress", "Better Sleep")
+    private var goalTitle: String {
+        onboardingVM.selectedGoal?.rawValue ?? audio.category.rawValue
+    }
+
     var body: some View {
         ZStack {
-            // Forest background
-            LinearGradient(
-                colors: [
-                    Color(red: 0.06, green: 0.18, blue: 0.13),
-                    Color(red: 0.15, green: 0.35, blue: 0.27),
-                    Color(red: 0.22, green: 0.48, blue: 0.36),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
+            GeometryReader { geo in
+                Image("AudioPlayerBg")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+            }
             .ignoresSafeArea()
-        
             
             ScrollView {
                 VStack(spacing: 0) {
@@ -39,15 +42,18 @@ struct AudioPlayerView: View {
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 20)
-                    
-                    // Title
-                    VStack(spacing: 8) {
+
+                    // Background title from onboarding goal
+                    VStack(spacing: 6) {
+                        Text(goalTitle)
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.9))
                         Text(audio.title)
-                            .font(.system(size: 30, weight: .bold))
+                            .font(.system(size: 28, weight: .bold))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                     }
-                    .padding(.top, 40)
+                    .padding(.top, 24)
                     .padding(.horizontal, 32)
                     
                     // Waveform
@@ -77,11 +83,11 @@ struct AudioPlayerView: View {
                     }
                     .padding(.bottom, 28)
                     
-                    // Controls
+                    // Controls — gobackward.15 / play / goforward.15
                     HStack(spacing: 52) {
                         Button { vm.skipBackward() } label: {
-                            Image(systemName: "backward.fill")
-                                .font(.system(size: 22))
+                            Image(systemName: "gobackward.15")
+                                .font(.system(size: 28))
                                 .foregroundColor(.white)
                         }
                         
@@ -96,33 +102,59 @@ struct AudioPlayerView: View {
                         }
                         
                         Button { vm.skipForward() } label: {
-                            Image(systemName: "forward.fill")
-                                .font(.system(size: 22))
+                            Image(systemName: "goforward.15")
+                                .font(.system(size: 28))
                                 .foregroundColor(.white)
                         }
                     }
                     .padding(.bottom, 40)
                     
                     // Recommendations
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Recommendations")
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 24)
-                        
-                        VStack(spacing: 10) {
-                            ForEach(vm.recommendations.prefix(3)) { item in
-                                AudioRowCard(item: item, isDark: true) {
-                                    vm.load(item)
-                                }
+                    if !vm.recommendations.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Recommendations")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(.white)
                                 .padding(.horizontal, 24)
+                            
+                            VStack(spacing: 10) {
+                                ForEach(vm.recommendations) { item in
+                                    AudioRowCard(item: item, isDark: true) {
+                                        vm.load(item, source: source)
+                                    }
+                                    .padding(.horizontal, 24)
+                                }
                             }
                         }
+                        .padding(.bottom, 40)
                     }
-                    .padding(.bottom, 40)
                 }
             }
         }
-        .onAppear { vm.load(audio) }
+        .onAppear { vm.load(audio, source: source) }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black)
+        .toolbar(.hidden, for: .navigationBar)
     }
+}
+
+#Preview {
+    // 1. Siapkan Mock Data untuk AudioItem
+    // Sesuaikan parameter init dengan model AudioItem milik Anda
+    let mockAudio = AudioItem(
+        id: "1",
+        type: "stress",
+        title: "Deep Forest Relaxation",
+        description: "A soothing audio track for deep forest relaxation.",
+        duration: 300,
+        category: .stress, // Sesuaikan dengan enum Category Anda
+    )
+    
+    // 2. Siapkan Mock ViewModel untuk EnvironmentObject
+    let mockOnboarding = OnboardingViewModel()
+    // Opsional: Atur state tertentu jika ingin melihat tampilan yang berbeda
+    // mockOnboarding.selectedGoal = .reduceStress
+
+    AudioPlayerView(audio: mockAudio)
+        .environmentObject(mockOnboarding)
 }
