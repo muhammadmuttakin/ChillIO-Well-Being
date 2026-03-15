@@ -7,9 +7,16 @@ struct AudioPlayerView: View {
     @StateObject private var vm = AudioPlayerViewModel()
     @Environment(\.dismiss) var dismiss
 
-    /// Title from onboarding goal for background (e.g. "Reduce Stress", "Better Sleep")
+    /// The category of the currently playing audio (reactive — updates when recommendation is tapped).
+    private var currentCategory: AudioCategory {
+        vm.currentAudio?.category ?? audio.category
+    }
+
+    /// Goal label derived from the currently playing audio's category.
+    /// E.g. anxious → "Reduce Anxiety", sleep → "Better Sleep".
     private var goalTitle: String {
-        onboardingVM.selectedGoal?.rawValue ?? audio.category.rawValue
+        let matched = OnboardingGoal.allCases.first { $0.audioCategory == currentCategory }
+        return matched?.rawValue ?? currentCategory.rawValue
     }
 
     var body: some View {
@@ -48,7 +55,7 @@ struct AudioPlayerView: View {
                         Text(goalTitle)
                             .font(.system(size: 22, weight: .semibold))
                             .foregroundColor(.white.opacity(0.9))
-                        Text(audio.title)
+                        Text(vm.currentAudio?.title ?? audio.title)
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
